@@ -1,6 +1,3 @@
-#!/usr/bin/python
-
-
 import torch
 import torchvision
 import torchvision.transforms as transforms
@@ -38,24 +35,28 @@ class Net(nn.Module):
         x = self.fc3(x)
         return x
 
-net = Net().cuda()
-criterion = nn.CrossEntropyLoss()
-optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
+def main():
+    net = Net().cuda()
+    criterion = nn.CrossEntropyLoss()
+    optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
+    
+    for epoch in range(10):
+        running_loss = 0.0
+        for i, data in enumerate(trainloader, 0):
+            inputs, labels = data
+            inputs, labels = inputs.cuda(), labels.cuda()
+            optimizer.zero_grad()
+            outputs = net(inputs)
+            loss = criterion(outputs, labels)
+            loss.backward()
+            optimizer.step()
+            running_loss += loss.item()
+            if i % 2000 == 1999:
+                print('[%d, %5d] loss: %.3f' %
+                      (epoch + 1, i + 1, running_loss / 2000))
+                running_loss = 0.0
+    
+    print('Finished Training')
 
-for epoch in range(10):
-    running_loss = 0.0
-    for i, data in enumerate(trainloader, 0):
-        inputs, labels = data
-        inputs, labels = inputs.cuda(), labels.cuda()
-        optimizer.zero_grad()
-        outputs = net(inputs)
-        loss = criterion(outputs, labels)
-        loss.backward()
-        optimizer.step()
-        running_loss += loss.item()
-        if i % 2000 == 1999:
-            print('[%d, %5d] loss: %.3f' %
-                  (epoch + 1, i + 1, running_loss / 2000))
-            running_loss = 0.0
-
-print('Finished Training')
+if __name__ == "__main__":
+    main()
