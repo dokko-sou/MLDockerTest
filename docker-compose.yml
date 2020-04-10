@@ -1,0 +1,8 @@
+version: "3"
+services:
+  mlenv:
+    build: .
+    volumes:
+      - ${PWD}/script:/usr/src/script
+    working_dir: /usr/src/script
+    command: python iris.py
